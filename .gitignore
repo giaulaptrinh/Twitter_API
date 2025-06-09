@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.env
+.env.production
+.env.stagging
+uploads/".env.stagging" 

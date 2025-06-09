@@ -1,0 +1,1656 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: |-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification. You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+
+    Some useful links:
+    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8000
+
+tags:
+  - name: users
+    description: Các API liên quan đến người dùng twitter
+  - name: tweets
+    description: Các API liên quan đến tweet
+  - name: medias
+    description: Các API liên quan đến media như upload ảnh, video
+  - name: static
+    description: Các API liên quan đến serving static file như avatar, ảnh, video
+  - name: search
+    description: Các API liên quan đến tìm kiếm
+  - name: likes
+    description: Các API liên quan đến like tweet
+  - name: bookmarks
+    description: Các API liên quan đến bookmark tweet
+  - name: conversations
+    description: Các API liên quan đến chat
+
+paths:
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Đăng nhập
+      description: Đăng nhập vào hệ thống x clone
+      operationId: login
+      requestBody:
+        description: Thông tin đăng nhập của người dùng
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+        required: true
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: Lấy thông tin user
+      description: Lấy thông tin của người dùng hiện tại
+      operationId: getMe
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lấy thông tin user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - users
+      summary: Cập nhật thông tin user
+      description: Cập nhật thông tin của người dùng hiện tại
+      operationId: updateMe
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin cập nhật user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMeBody'
+        required: true
+      responses:
+        '200':
+          description: Cập nhật thông tin user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Đăng ký tài khoản
+      description: Đăng ký tài khoản mới
+      operationId: register
+      requestBody:
+        description: Thông tin đăng ký tài khoản
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+        required: true
+      responses:
+        '200':
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad Request - Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: Đăng xuất
+      description: Đăng xuất khỏi hệ thống
+      operationId: logout
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin đăng xuất
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTcwMDAyMzIyNn0.bFnaBfxWl-Q48HCwAeMpNzZwTO9LEjcBd7Zyipjqr64
+        required: true
+      responses:
+        '200':
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/verify-email:
+    post:
+      tags:
+        - users
+      summary: Xác thực email
+      description: Xác thực tài khoản của người dùng bằng token được gửi qua email
+      operationId: verifyEmail
+      requestBody:
+        description: Thông tin để xác thực email
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email_verify_token
+              properties:
+                email_verify_token:
+                  type: string
+                  description: Token xác thực email được gửi qua email
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MiwidmVyaWZ5IjowLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTY5MTQ2OTYyNn0.XYZabc123...
+        required: true
+      responses:
+        '200':
+          description: Xác thực email thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad Request - Invalid token or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/refresh-token:
+    post:
+      tags:
+        - users
+      summary: Lấy lại access token
+      description: Làm mới access token bằng refresh token
+      operationId: refreshToken
+      requestBody:
+        description: Thông tin làm mới access token
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTcwMDAyMzIyNn0.bFnaBfxWl-Q48HCwAeMpNzZwTO9LEjcBd7Zyipjqr64
+        required: true
+      responses:
+        '200':
+          description: Làm mới access token thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/resend-verify-email:
+    post:
+      tags:
+        - users
+      summary: Gửi lại email xác thực
+      description: Gửi lại email để xác thực tài khoản
+      operationId: resendVerifyEmail
+      requestBody:
+        description: Thông tin gửi lại email xác thực
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  example: duthanhduoc100@gmail.com
+        required: true
+      responses:
+        '200':
+          description: Gửi lại email xác thực thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad Request - Invalid email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/forgot-password:
+    post:
+      tags:
+        - users
+      summary: Quên mật khẩu
+      description: Gửi email để đặt lại mật khẩu
+      operationId: forgotPassword
+      requestBody:
+        description: Thông tin để gửi email đặt lại mật khẩu
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  example: duthanhduoc100@gmail.com
+        required: true
+      responses:
+        '200':
+          description: Nhận được email reset password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad Request - Invalid email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/verify-forgot-password:
+    post:
+      tags:
+        - users
+      summary: Xác thực link reset mật khẩu
+      description: Xác thực token trong email để reset mật khẩu
+      operationId: verifyForgotPassword
+      requestBody:
+        description: Thông tin xác thực token
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - forgot_password_token
+              properties:
+                forgot_password_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTcwMDAyMzIyNn0.bFnaBfxWl-Q48HCwAeMpNzZwTO9LEjcBd7Zyipjqr64
+        required: true
+      responses:
+        '200':
+          description: Xác thực link reset mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/reset-password:
+    post:
+      tags:
+        - users
+      summary: Reset mật khẩu
+      description: Đặt lại mật khẩu bằng token
+      operationId: resetPassword
+      requestBody:
+        description: Thông tin để đặt lại mật khẩu
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - forgot_password_token
+                - password
+                - confirm_password
+              properties:
+                forgot_password_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTcwMDAyMzIyNn0.bFnaBfxWl-Q48HCwAeMpNzZwTO9LEjcBd7Zyipjqr64
+                password:
+                  type: string
+                  example: Duoc123!
+                confirm_password:
+                  type: string
+                  example: Duoc123!
+        required: true
+      responses:
+        '200':
+          description: Reset mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{username}:
+    get:
+      tags:
+        - users
+      summary: Lấy thông tin user theo username
+      description: Lấy thông tin user dựa trên username
+      operationId: getUserByUsername
+      parameters:
+        - name: username
+          in: path
+          description: Username của user
+          required: true
+          schema:
+            type: string
+            example: giau1234
+      responses:
+        '200':
+          description: Lấy thông tin user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not Found - User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/follow:
+    post:
+      tags:
+        - users
+      summary: Follow user
+      description: Theo dõi một người dùng
+      operationId: followUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin để theo dõi user
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - followed_user_id
+              properties:
+                followed_user_id:
+                  type: string
+                  format: MongoId
+                  example: 64be0ad2e43d2464394feedb
+        required: true
+      responses:
+        '200':
+          description: Follow user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{user_id}:
+    delete:
+      tags:
+        - users
+      summary: Unfollow user
+      description: Hủy theo dõi một người dùng
+      operationId: unfollowUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          description: Id của user
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+      responses:
+        '200':
+          description: Unfollow user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/change-password:
+    put:
+      tags:
+        - users
+      summary: Đổi mật khẩu
+      description: Đổi mật khẩu của người dùng hiện tại
+      operationId: changePassword
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin để đổi mật khẩu
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - old_password
+                - password
+                - confirm_password
+              properties:
+                old_password:
+                  type: string
+                  example: Duoc123!
+                password:
+                  type: string
+                  example: Duoc1234!
+                confirm_password:
+                  type: string
+                  example: Duoc1234!
+        required: true
+      responses:
+        '200':
+          description: Đổi mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tweets:
+    post:
+      tags:
+        - tweets
+      summary: Tạo tweet
+      description: Tạo một tweet mới
+      operationId: createTweet
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin để tạo tweet
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TweetRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Tạo tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - tweets
+      summary: Lấy danh sách tweet
+      description: Lấy danh sách tweet từ những người mình theo dõi
+      operationId: getTweets
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Số trang
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Số lượng tweet trên 1 trang
+          required: false
+          schema:
+            type: integer
+            example: 10
+      responses:
+        '200':
+          description: Lấy danh sách tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetListResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tweets/{tweet_id}:
+    get:
+      tags:
+        - tweets
+      summary: Lấy thông tin tweet theo id
+      description: Lấy thông tin chi tiết của tweet theo id
+      operationId: getTweetById
+      parameters:
+        - name: tweet_id
+          in: path
+          description: Id của tweet
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+      responses:
+        '200':
+          description: Lấy thông tin tweet thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lấy thông tin tweet theo id thành công
+                  result:
+                    $ref: '#/components/schemas/Tweet'
+        '404':
+          description: Not Found - Tweet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tweets/{tweet_id}/children:
+    get:
+      tags:
+        - tweets
+      summary: Lấy danh sách tweet con
+      description: Lấy danh sách tweet con theo id của tweet cha
+      operationId: getTweetChildrenById
+      parameters:
+        - name: tweet_id
+          in: path
+          description: Id của tweet
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+        - name: page
+          in: query
+          description: Số trang
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Số lượng tweet trên 1 trang
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: tweet_type
+          in: query
+          description: Loại tweet
+          required: false
+          schema:
+            $ref: '#/components/schemas/TweetType'
+      responses:
+        '200':
+          description: Lấy danh sách tweet con thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetListResponse'
+        '404':
+          description: Not Found - Tweet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /medias/upload-image:
+    post:
+      tags:
+        - medias
+      summary: Upload ảnh
+      description: Upload một hoặc nhiều ảnh
+      operationId: uploadImage
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin upload ảnh
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 4
+        required: true
+      responses:
+        '200':
+          description: Upload ảnh thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload ảnh thành công
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Media'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /medias/upload-video:
+    post:
+      tags:
+        - medias
+      summary: Upload video
+      description: Upload một video
+      operationId: uploadVideo
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Thông tin upload video
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                video:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: Upload video thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload video thành công
+                  result:
+                    $ref: '#/components/schemas/Media'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /search:
+    get:
+      tags:
+        - search
+      summary: Tìm kiếm tweet
+      description: Tìm kiếm tweet theo nội dung hoặc loại media
+      operationId: searchTweets
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content
+          in: query
+          description: Nội dung tweet để tìm kiếm
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Số trang
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Số lượng tweet trên 1 trang
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: media_type
+          in: query
+          description: Loại media
+          required: false
+          schema:
+            type: string
+            enum:
+              - image
+              - video
+            example: image
+        - name: people_follow
+          in: query
+          description: Chỉ tìm tweet của những người mình theo dõi
+          required: false
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Tìm kiếm tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetListResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /likes:
+    post:
+      tags:
+        - likes
+      summary: Like tweet
+      description: Thích một tweet
+      operationId: likeTweet
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: ID của tweet để thích
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Like tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - likes
+      summary: Lấy danh sách tweet đã thích
+      description: Lấy danh sách các tweet mà người dùng đã thích
+      operationId: getTweetsLiked
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Số trang
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Số lượng tweet trên 1 trang
+          required: false
+          schema:
+            type: integer
+            example: 10
+      responses:
+        '200':
+          description: Lấy danh sách tweet đã thích thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetListResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /likes/tweets/{tweet_id}:
+    delete:
+      tags:
+        - likes
+      summary: Unlike tweet theo tweet_id
+      description: Hủy thích một tweet theo tweet_id
+      operationId: unlikeTweetByTweetId
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tweet_id
+          in: path
+          description: ID của tweet
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+      responses:
+        '200':
+          description: Unlike tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /likes/{like_id}:
+    delete:
+      tags:
+        - likes
+      summary: Unlike tweet theo like_id
+      description: Hủy thích một tweet theo like_id
+      operationId: unlikeTweetByLikeId
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: like_id
+          in: path
+          description: ID của like
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+      responses:
+        '200':
+          description: Unlike tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /bookmarks:
+    post:
+      tags:
+        - bookmarks
+      summary: Bookmark tweet
+      description: Đánh dấu một tweet
+      operationId: bookmarkTweet
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: ID của tweet để đánh dấu
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookmarkRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Bookmark tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - bookmarks
+      summary: Lấy danh sách tweet đã đánh dấu
+      description: Lấy danh sách các tweet mà người dùng đã đánh dấu
+      operationId: getTweetsBookmarked
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Số trang
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Số lượng tweet trên 1 trang
+          required: false
+          schema:
+            type: integer
+            example: 10
+      responses:
+        '200':
+          description: Lấy danh sách tweet đã đánh dấu thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetListResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /bookmarks/tweets/{tweet_id}:
+    delete:
+      tags:
+        - bookmarks
+      summary: Unbookmark tweet theo tweet_id
+      description: Hủy đánh dấu một tweet theo tweet_id
+      operationId: unbookmarkTweetByTweetId
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tweet_id
+          in: path
+          description: ID của tweet
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+      responses:
+        '200':
+          description: Unbookmark tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /bookmarks/{bookmark_id}:
+    delete:
+      tags:
+        - bookmarks
+      summary: Unbookmark tweet theo bookmark_id
+      description: Hủy đánh dấu một tweet theo bookmark_id
+      operationId: unbookmarkTweetByBookmarkId
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: bookmark_id
+          in: path
+          description: ID của bookmark
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+      responses:
+        '200':
+          description: Unbookmark tweet thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /conversations/receivers/{receiver_id}:
+    get:
+      tags:
+        - conversations
+      summary: Lấy danh sách hội thoại
+      description: Lấy danh sách hội thoại với một người nhận
+      operationId: getConversationsByReceiverId
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: receiver_id
+          in: path
+          description: ID của người nhận
+          required: true
+          schema:
+            type: string
+            format: MongoId
+            example: 64be0ad2e43d2464394feedb
+        - name: page
+          in: query
+          description: Số trang
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Số lượng hội thoại trên 1 trang
+          required: false
+          schema:
+            type: integer
+            example: 10
+      responses:
+        '200':
+          description: Lấy danh sách hội thoại thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationListResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    LoginBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: hmt1@gmail.com
+        password:
+          type: string
+          example: '@Aa1234567'
+
+    SuccessAuthentication:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTY5MTQ2OTYyNn0.HTLX20cB7_z0c9c8FDg3MIx6RJEELHHlmJNZa94ku-o
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjRiZTBhZDJlNDNkMjQ2NDM5NGZlZWRiIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE2OTEzODMyMjYsImV4cCI6MTcwMDAyMzIyNn0.bFnaBfxWl-Q48HCwAeMpNzZwTO9LEjcBd7Zyipjqr64
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: johndoe@example.com
+        date_of_birth:
+          type: string
+          format: date-time
+          example: 2023-06-08T10:17:31.096Z
+        created_at:
+          type: string
+          format: date-time
+          example: 2023-03-08T12:00:00Z
+        updated_at:
+          type: string
+          format: date-time
+          example: 2023-03-08T12:00:00Z
+        verify:
+          $ref: '#/components/schemas/UserVerifyStatus'
+        twitter_circle:
+          type: array
+          items:
+            type: string
+            format: MongoId
+          example: ['64be0ad2e43d2464394feedb', '64be0ad2e43d2464394feedc']
+        bio:
+          type: string
+          example: This is my bio.
+        location:
+          type: string
+          example: San Francisco, CA
+        website:
+          type: string
+          example: https://www.example.com
+        username:
+          type: string
+          example: johndoe
+        avatar:
+          type: string
+          example: http://localhost:4000/images/avatars/johndoe.jpg
+        cover_photo:
+          type: string
+          example: http://localhost:4000/images/covers/johndoe.jpg
+
+    UserVerifyStatus:
+      type: number
+      enum:
+        - 0 # Unverified
+        - 1 # Verified
+        - 2 # Banned
+      example: 1
+
+    RegisterBody:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - confirm_password
+        - date_of_birth
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: duthanhduoc100@gmail.com
+        password:
+          type: string
+          example: Duoc123!
+        confirmics:
+          type: string
+          example: Duoc123!
+        date_of_birth:
+          type: string
+          format: date-time
+          example: 2023-06-08T10:17:31.096Z
+
+    UpdateMeBody:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        date_of_birth:
+          type: string
+          format: date-time
+          example: 2023-06-08T10:17:31.096Z
+        bio:
+          type: string
+          example: This is my bio.
+        location:
+          type: string
+          example: San Francisco, CA
+        website:
+          type: string
+          example: https://www.example.com
+        username:
+          type: string
+          example: johndoe
+        avatar:
+          type: string
+          example: http://localhost:4000/images/avatars/johndoe.jpg
+        cover_photo:
+          type: string
+          example: http://localhost:4000/images/covers/johndoe.jpg
+
+    TweetRequestBody:
+      type: object
+      required:
+        - type
+        - audience
+        - content
+      properties:
+        type:
+          $ref: '#/components/schemas/TweetType'
+        audience:
+          $ref: '#/components/schemas/TweetAudience'
+        content:
+          type: string
+          description: Nội dung tweet
+          example: This is my tweet.
+        parent_id:
+          type: string
+          nullable: true
+          description: ID của tweet cha
+          example: 64be0ad2e43d2464394feedb
+        hashtags:
+          type: array
+          items:
+            type: string
+          description: Danh sách hashtag
+          example: ['hashtag1', 'hashtag2']
+        mentions:
+          type: array
+          items:
+            type: string
+            format: MongoId
+          description: Danh sách user_id được đề cập
+          example: ['64be0ad2e43d2464394feedb', '64be0ad2e43d2464394feedc']
+        medias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+          description: Danh sách media đính kèm
+
+    TweetType:
+      type: number
+      enum:
+        - 0 # Tweet
+        - 1 # Retweet
+        - 2 # Comment
+        - 3 # QuoteTweet
+      example: 0
+
+    TweetAudience:
+      type: number
+      enum:
+        - 0 # Everyone
+        - 1 # TwitterCircle
+      example: 0
+
+    PeopleFollow:
+      type: string
+      enum:
+        - Anyone
+        - Following
+      example: Anyone
+
+    EncodingStatus:
+      type: number
+      enum:
+        - 0 # Pending
+        - 1 # Processing
+        - 2 # Success
+        - 3 # Failed
+      example: 2
+
+    MediaTypeQuery:
+      type: string
+      enum:
+        - image
+        - video
+      example: image
+
+    MediaType:
+      type: number
+      enum:
+        - 0 # Image
+        - 1 # Video
+        - 2 # HLS
+      example: 0
+
+    Media:
+      type: object
+      properties:
+        url:
+          type: string
+          example: http://localhost:4000/images/avatars/johndoe.jpg
+        type:
+          $ref: '#/components/schemas/MediaType'
+
+    Tweet:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: MongoId
+          description: ID của tweet
+          example: 64be0ad2e43d2464394feedb
+        user_id:
+          type: string
+          format: MongoId
+          description: ID của người dùng tạo tweet
+          example: 64be0ad2e43d2464394feedb
+        type:
+          $ref: '#/components/schemas/TweetType'
+        audience:
+          $ref: '#/components/schemas/TweetAudience'
+        content:
+          type: string
+          description: Nội dung tweet
+          example: This is my tweet.
+        parent_id:
+          type: string
+          nullable: true
+          format: MongoId
+          description: ID của tweet cha
+          example: 64be0ad2e43d2464394feedb
+        hashtags:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                format: MongoId
+                description: ID của hashtag
+                example: 64be0ad2e43d2464394feedb
+              name:
+                type: string
+                description: Tên của hashtag
+                example: hashtag1
+              created_at:
+                type: string
+                format: date-time
+                description: Thời gian tạo hashtag
+                example: 2023-03-08T12:00:00Z
+          description: Danh sách hashtag
+          example:
+            - _id: 64be0ad2e43d2464394feedb
+              name: hashtag1
+              created_at: 2023-03-08T12:00:00Z
+            - _id: 64be0ad2e43d2464394feedc
+              name: hashtag2
+              created_at: 2023-03-08T12:00:00Z
+        mentions:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                format: MongoId
+                description: ID của user được đề cập
+                example: 64be0ad2e43d2464394feedb
+              name:
+                type: string
+                description: Tên của user được đề cập
+                example: John Doe
+              username:
+                type: string
+                description: Username của user được đề cập
+                example: johndoe
+              email:
+                type: string
+                description: Email của user được đề cập
+                example: duthanhduoc@gmail.com
+        medias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+          description: Danh sách media đính kèm
+          example:
+            - url: http://localhost:4000/images/avatars/johndoe.jpg
+              type: 0
+            - url: http://localhost:4000/images/avatars/johndoe.jpg
+              type: 1
+        retweet_count:
+          type: integer
+          description: Số lần retweet
+          example: 10
+        comment_count:
+          type: integer
+          description: Số lần comment
+          example: 5
+        quote_count:
+          type: integer
+          description: Số lần quote
+          example: 2
+        bookmarks:
+          type: integer
+          description: Số lần bookmark
+          example: 15
+        likes:
+          type: integer
+          description: Số lần like
+          example: 20
+        guest_views:
+          type: integer
+          description: Số lần xem của khách
+          example: 100
+        user_views:
+          type: integer
+          description: Số lần xem của người dùng
+          example: 50
+        created_at:
+          type: string
+          format: date-time
+          description: Thời gian tạo tweet
+          example: 2023-03-08T12:00:00Z
+        updated_at:
+          type: string
+          format: date-time
+          description: Thời gian cập nhật tweet
+          example: 2023-03-08T12:00:00Z
+
+    LikeRequestBody:
+      type: object
+      required:
+        - tweet_id
+      properties:
+        tweet_id:
+          type: string
+          format: MongoId
+          description: Tweet ID
+          example: 64be0ad2e43d2464394feedb
+
+    BookmarkRequestBody:
+      type: object
+      required:
+        - tweet_id
+      properties:
+        tweet_id:
+          type: string
+          format: MongoId
+          description: Tweet ID
+          example: 64be0ad2e43d2464394feedb
+
+    UnTweetResponseBody:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        tweet_id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        user_id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        created_at:
+          type: string
+          format: date-time
+          example: 2021-09-30T15:00:00.000Z
+
+    Conversation:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        sender_id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        receiver_id:
+          type: string
+          format: MongoId
+          example: 64be0ad2e43d2464394feedb
+        content:
+          type: string
+          example: Hello world!
+        created_at:
+          type: string
+          format: date-time
+          example: 2021-09-30T15:00:00.000Z
+        updated_at:
+          type: string
+          format: date-time
+          example: 2021-09-30T15:00:00.000Z
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Operation successful
+        result:
+          type: object
+          additionalProperties: true
+
+    TweetListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Lấy danh sách tweet thành công
+        result:
+          type: object
+          properties:
+            tweets:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tweet'
+            total_page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            page:
+              type: integer
+              example: 1
+
+    ConversationListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Get conversations successfully
+        conversations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
+        result:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 1
+            total_pages:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            total_items:
+              type: integer
+              example: 1
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: An error occurred
+        code:
+          type: string
+          example: ERROR_CODE
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

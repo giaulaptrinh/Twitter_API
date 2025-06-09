@@ -1,0 +1,160 @@
+openapi: 3.0.3
+info:
+  title: Twitter Clone Typescript - 2025
+  description: |
+    **This is a sample Twitter Clone API based on the OpenAPI 3.0 specification.**
+    You can find out more about Swagger at [https://swagger.io](https://swagger.io).
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: levangiau20032020@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+  - url: http://localhost:8000
+
+tags:
+  - name: users
+    description: APIs related to user management
+
+paths:
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: User Login
+      description: Authenticate a user and return access and refresh tokens.
+      operationId: login
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login success
+                  result:
+                    $ref: '#/components/schemas/SuccessAuthentication'
+
+        '422':
+          description: Invalid input
+
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: Get User Profile
+      description: Lấy thông tin user
+      operationId: getProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lấy thông tin user thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+components:
+  schemas:
+    LoginBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: levangiau20032020@gmail.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: Levangiau@123
+    SuccessAuthentication:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '67b98f96d4f9885b21206b67'
+          format: MongoId
+        name:
+          type: string
+          example: 'Lê Văn Giàu'
+        email:
+          type: string
+          format: email
+          example: 'levangiau@gmail.com'
+        date_of_birth:
+          type: string
+          format: ISO8601
+          example: '2024-12-02T08:23:45.000Z'
+        created_at:
+          type: string
+          format: ISO8601
+          example: '2025-02-22T08:49:26.909Z'
+        updated_at:
+          type: string
+          format: ISO8601
+          example: '2025-02-22T08:49:26.909Z'
+        verify:
+          $ref: '#/components/schemas/UserVerifyStatus'
+        twitter_circle:
+          type: array
+          items:
+            type: string
+            format: MongoId
+          example: ['67b98f96d4f9885b21206b67', '67a9d9bb60bdc0fc43206e1f']
+        bio:
+          type: string
+          example: 'This is my bio'
+        location:
+          type: string
+          example: 'Hanoi, Vietnam'
+        website:
+          type: string
+          example: 'www.levangiau.com'
+        username:
+          type: string
+          example: 'user67b98f96d4f9885b21206b67'
+        avatar:
+          type: string
+          example: ''
+        cover_photo:
+          type: string
+          example: 'https://www.levangiau.com/images/avatars/cover-photo.jpg'
+    UserVerifyStatus:
+      type: number
+      enum: [Unverified, Verified, Banned]
+      example: 1
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
