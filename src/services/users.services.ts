@@ -327,6 +327,7 @@ class usersService {
         }
       }
     ])
+    console.log('forgot_password_token', forgot_password_token)
     //gửi mail kèm đường link đến email người dùng :https://twitter.com/forgot-password?token=token
     await sendForgotPasswordEmail(email, forgot_password_token)
 

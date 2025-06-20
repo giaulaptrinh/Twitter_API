@@ -3,4 +3,4 @@ dist/
 .env
 .env.production
 .env.stagging
-uploads/".env.stagging" 
+uploads/
