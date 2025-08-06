@@ -1,4 +1,4 @@
-FROM node:21-alpine3.18
+FROM node:21
 
 WORKDIR /app
 
@@ -10,12 +10,12 @@ COPY .env.production .
 COPY ./src ./src
 COPY ./openapi ./openapi
 
-RUN apk add --no-cache ffmpeg vips-dev build-base python3
+RUN apt-get update && apt-get install -y ffmpeg libvips-dev build-essential python3 && rm -rf /var/lib/apt/lists/*
 
 RUN npm install pm2 -g
 RUN npm install
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 3300
 
 CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]

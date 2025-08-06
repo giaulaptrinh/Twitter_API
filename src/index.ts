@@ -69,7 +69,7 @@ try {
   console.error('Error loading .env file:', error)
 }
 
-const port = process.env.PORT
+const port = Number(envConfig.port) || 8000
 console.log('PORT', port)
 
 initFolder()
@@ -104,6 +104,6 @@ databaseService.connect().then(() => {
 app.use(defaultErrorHandler)
 initSocket(httpServer)
 
-httpServer.listen(port, () => {
+httpServer.listen(port, '0.0.0.0', () => {
   console.log(`Example app listening on port ${port}`)
 })
